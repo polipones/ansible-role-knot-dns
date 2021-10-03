@@ -10,12 +10,13 @@
 
 - name: Create logging directory
   file:
-    path: "{{ knot_log.target }}"
+    path: "{{ item.target }}"
     state: directory
     owner: "{{ knot_user }}"
     group: "{{ knot_group }}"
     mode: 0775
   when: knot_log is defined
+  loop: "{{ knot_log | from_yaml | list }}"
 
 - name: Configure Knot
   template:
@@ -24,8 +25,6 @@
     mode: '640'
     owner: "{{ knot_user }}"
     group: "{{ knot_group }}"
-    validate: "knotc -c %s conf-check"
-  notify: restart_knot
 
 - name: Enable and start knot
   service:

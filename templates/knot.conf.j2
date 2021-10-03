@@ -7,17 +7,23 @@ server:
   listen: {{ addr }}
 {% endfor %}
 
+log:
 {{ knot_log }}
 
 {% if knot_statistics_enabled %}
-{{ knot_statistics }}
+statistics:
+    {{ knot_statistics }}
 {% endif %}
 
+remote:
 {{ knot_remote }}
 
+acl:
 {{ knot_acl }}
 
+template:
 {{ knot_template }}
 
+zone:
 {{ knot_zone }}
 

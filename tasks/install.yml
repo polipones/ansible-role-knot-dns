@@ -1,4 +1,9 @@
----
+- name: Install basic packages
+  apt:
+    pkg:
+      - gpg
+    update_cache: yes
+
 # Ubuntu
 - name: Add repo (Ubuntu)
   apt_repository:
@@ -9,7 +14,7 @@
 # Debian
 - name: Add repo keys (Debian)
   apt_key:
-    url: "https://deb.knot-dns.cz/knot/apt.gpg"
+    url: "https://deb.knot-dns.cz/apt.gpg"
     state: present
   when: ansible_distribution == "Debian"
 
