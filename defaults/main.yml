@@ -1,22 +1,53 @@
----
-## Installation options
-knot_from_source: false
-knot_git_branch: master
-knot_install_dir: ""
+# Installation options
 knot_user: knot
 knot_group: knot
 knot_daemon: knot
-## Configuration options
+
+# Configuration options
+
+### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#listen
 knot_interfaces:
-  - 127.0.0.1@5300
-  - ::1@5300
+  - 127.0.0.1@53
+  - ::1@53
   - "{{ ansible_default_ipv4.address }}"
   - "{{ ansible_default_ipv6.address }}"
-knot_keys:
-  - { id: 'slave1_key', algorithm: 'hmac-md5', secret: 'Wg==' }
-knot_zones:
-  - { name: 'example.com', template: 'default' }
-knot_extras: |
-  server:
-    rate-limit: 10
+
+knot_master: true
+
+### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#logging-section
+knot_log:
+  - target: /var/log/knot/knot.log # Warning: Write only directory here or modify main task
+    any: debug
+
+### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#statistics-section
+knot_statistics_enabled: true
+knot_statistics:
+  - timer: 60
+    file: /var/log/knot/statistics.log
+    append: true
+
+### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#remote-section
+# knot_remote:
+#   - id: slave_example
+#     address: 0.0.0.0
+#     block-notify-after-transfer: off
+
+### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#acl-section
+# knot_acl:
+#   - id: acl_slave_example
+#     remote: slave_example
+#     action: transfer
+
+### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#template-section
+# knot_template:
+#   - id: default
+#     notify: [slave_example]
+#     acl: [acl_slave_example]
+#     dnssec-signing: on
+#     zonemd-generate: zonemd-sha512
+
+### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#zone-section
+knot_zone:
+  - domain: "example.com"
+    # master: master_remote # Needed if slave
 

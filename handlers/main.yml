@@ -1,3 +1,5 @@
 ---
-- name: restart knot
-  service: "name={{ knot_daemon }} state=restarted"
+- name: restart_knot
+  service:
+    name: "{{ knot_daemon }}"
+    state: restarted

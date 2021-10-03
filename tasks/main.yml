@@ -1,29 +1,34 @@
----
-- name: install from source
-  include: from_source.yml
-  when: knot_from_source
-- name: install from packages
-  include: from_pkgs.yml
-  when: not knot_from_source
+- name: Install Knot
+  include: install.yml
 
-# Post-install
-- name: set config path (FreeBSD)
-  lineinfile: dest=/etc/rc.conf regexp='^knot_config=' line="knot_config={{ knot_install_dir }}/etc/knot/knot.conf"
-  when: ansible_os_family == "FreeBSD"
+- name: Check variables when slave
+  fail:
+    msg: "{{ item }} is required in slave DNS server"
+  when: not (knot_master | bool) and item is not defined
+  loop:
+    - knot_zone.master
 
-# Configuration
-- name: configure knot
-  template: >
-    src=knot.conf.j2
-    dest={{ knot_install_dir }}/etc/knot/knot.conf
-    mode=640
-    owner={{ knot_user }}
-    group={{ knot_group }}
-    validate="knotc -c %s conf-check"
-  notify: restart knot
-  tags: dns
-- name: enable knot
-  service: >
-    name={{ knot_daemon }}
-    enabled=True
-    state=started
+- name: Create logging directory
+  file:
+    path: "{{ knot_log.target }}"
+    state: directory
+    owner: "{{ knot_user }}"
+    group: "{{ knot_group }}"
+    mode: 0775
+  when: knot_log is defined
+
+- name: Configure Knot
+  template:
+    src: knot.conf.j2
+    dest: /etc/knot/knot.conf
+    mode: '640'
+    owner: "{{ knot_user }}"
+    group: "{{ knot_group }}"
+    validate: "knotc -c %s conf-check"
+  notify: restart_knot
+
+- name: Enable and start knot
+  service:
+    name: "{{ knot_daemon }}"
+    enabled: true
+    state: started

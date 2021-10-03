@@ -2,43 +2,22 @@
 
 # Server options
 server:
-  rundir: {{ knot_install_dir }}/var/run/knot
-  user: "{{ knot_user }}:{{ knot_group }}"
+  user: {{ knot_user }}:{{ knot_group }}
 {% for addr in knot_interfaces %}
   listen: {{ addr }}
 {% endfor %}
 
-log:
-  - target: syslog
-    any: info
+{{ knot_log }}
 
-# Key lists
-key:
-{% for key in knot_keys %}
-  - id: {{ key.id }}
-{% if 'algorithm' in key %}
-    algorithm: {{ key.algorithm }}
+{% if knot_statistics_enabled %}
+{{ knot_statistics }}
 {% endif %}
-{% if 'secret' in key %}
-    secret: {{ key.secret }}
-{% endif %}
-{% endfor %}
 
-# Server-specific extras
-{{ knot_extras }}
+{{ knot_remote }}
 
-# Zone lists
-zone:
-{% for zone in knot_zones %}
-  - domain: {{ zone.name }}
-{% if 'template' in zone %}
-    template: {{ zone.template }}
-{% endif %}
-{% if 'module' in zone %}
-    module: {{ zone.module }}
-{% endif %}
-{% if 'file' in zone %}
-    file: {{ zone.file }}
-{% endif %}
-{% endfor %}
+{{ knot_acl }}
+
+{{ knot_template }}
+
+{{ knot_zone }}
 
