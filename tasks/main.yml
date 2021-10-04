@@ -1,22 +1,26 @@
 - name: Install Knot
   include: install.yml
 
-- name: Check variables when slave
-  fail:
-    msg: "{{ item }} is required in slave DNS server"
-  when: not (knot_master | bool) and item is not defined
-  loop:
-    - knot_zone.master
-
-- name: Create logging directory
+- name: Create logging directories
   file:
-    path: "{{ item.target }}"
+    path: "{{ item.target | dirname }}"
     state: directory
+    recurse: yes
     owner: "{{ knot_user }}"
     group: "{{ knot_group }}"
     mode: 0775
   when: knot_log is defined
-  loop: "{{ knot_log | from_yaml | list }}"
+  loop: "{{ knot_log }}"
+
+- name: Create logging files
+  file:
+    path: "{{ item.target }}"
+    state: touch
+    owner: "{{ knot_user }}"
+    group: "{{ knot_group }}"
+    mode: 0775
+  when: knot_log is defined
+  loop: "{{ knot_log }}"
 
 - name: Configure Knot
   template:
@@ -31,9 +35,9 @@
     cmd: 'knotc -c /etc/knot/knot.conf conf-check'
   register: conf_check_out
 
-- name: Enable and start knot
+- name: Enable and restart knot
   service:
     name: "{{ knot_daemon }}"
     enabled: true
-    state: started
-  when: conf_check_out.rc | bool
+    state: restarted
+  when: conf_check_out.rc == 0

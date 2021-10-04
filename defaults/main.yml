@@ -16,38 +16,37 @@ knot_master: true
 
 ### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#logging-section
 knot_log:
-  - target: /var/log/knot/knot.log # Warning: Write only directory here or modify main task
-    any: debug
+  - target: /var/log/knot/knot.log # Warning: Write only file here or modify main task
+    level: debug
 
-### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#statistics-section
-knot_statistics_enabled: true
-knot_statistics:
-  - timer: 60
+knot_config: |
+  ### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#statistics-section
+  statistics:
+    timer: 3600 # seconds
     file: /var/log/knot/statistics.log
     append: true
 
-### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#remote-section
-# knot_remote:
-#   - id: slave_example
-#     address: 0.0.0.0
-#     block-notify-after-transfer: off
+  ### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#remote-section
+  # remote:
+  #   - id: slave_example
+  #     address: 0.0.0.0
+  #     block-notify-after-transfer: off
 
-### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#acl-section
-# knot_acl:
-#   - id: acl_slave_example
-#     remote: slave_example
-#     action: transfer
+  ### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#acl-section
+  # acl:
+  #   - id: acl_slave_example
+  #     remote: slave_example
+  #     action: transfer
 
-### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#template-section
-# knot_template:
-#   - id: default
-#     notify: [slave_example]
-#     acl: [acl_slave_example]
-#     dnssec-signing: on
-#     zonemd-generate: zonemd-sha512
+  ### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#template-section
+  # template:
+  #   - id: default
+  #     notify: [slave_example]
+  #     acl: [acl_slave_example]
+  #     dnssec-signing: on
+  #     zonemd-generate: zonemd-sha512
 
-### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#zone-section
-knot_zone:
-  - domain: "example.com"
-    # master: master_remote # Needed if slave
-
+  ### https://www.knot-dns.cz/docs/3.1/singlehtml/index.html#zone-section
+  zone:
+    - domain: "example.com"
+      # master: master_remote # Needed if slave
