@@ -26,8 +26,14 @@
     owner: "{{ knot_user }}"
     group: "{{ knot_group }}"
 
+- name: Check valid configuration
+  command:
+    cmd: 'knotc -c /etc/knot/knot.conf conf-check'
+  register: conf_check_out
+
 - name: Enable and start knot
   service:
     name: "{{ knot_daemon }}"
     enabled: true
     state: started
+  when: conf_check_out.rc | bool
